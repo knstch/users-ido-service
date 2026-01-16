@@ -1,0 +1,60 @@
+services:
+  postgres:
+    container_name: users-postgres
+    restart: always
+    build:
+      context: docker/postgres
+      dockerfile: postgres.Dockerfile
+      shm_size: '256m'
+    image: users-ido-postgres:16.2
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      TZ: "Asia/Novosibirsk"
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 30s
+      timeout: 2s
+      retries: 2
+      start_period: 5s
+    ports:
+      - ${PG_EXTERNAL_PORT:-5432}:5432
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - ido-net
+  app:
+    container_name: users-ido-app
+    restart: always
+    build:
+      context: .
+      dockerfile: docker/go-service/go.Dockerfile
+      args:
+        PORT: ${PUBLIC_HTTP_ADDR}
+    image: users-ido-app:latest
+    environment:
+      - TZ=Asia/Novosibirsk
+    ports:
+      - ${PUBLIC_HTTP_ADDR}:${PUBLIC_HTTP_ADDR}
+    networks:
+      - ido-net
+  outbox:
+    container_name: outbox
+    restart: always
+    build:
+      context: .
+      dockerfile: docker/go-outbox/go.Dockerfile
+    image: outbox-app:latest
+    environment:
+      - TZ=Asia/Novosibirsk
+    networks:
+      - ido-net
+volumes:
+  pg_data:
+    name: ido-pg_data
+networks:
+  ido-net:
+    name: ido-net
+    driver: bridge

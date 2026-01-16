@@ -1,0 +1,11 @@
+syntax = "proto3";
+package mock.public;
+option go_package = "./";
+
+service Template {
+  rpc Mock(Request) returns (Response);
+}
+
+message Request {}
+
+message Response {}
