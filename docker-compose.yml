@@ -25,6 +25,39 @@ services:
       - pg_data:/var/lib/postgresql/data
     networks:
       - ido-net
+  postgres_test:
+    container_name: users-postgres-test
+    restart: unless-stopped
+    build:
+      context: docker/postgres
+      dockerfile: postgres.Dockerfile
+      shm_size: '256m'
+    image: users-ido-postgres:16.2
+    env_file:
+      - test.env
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      TZ: "Asia/Novosibirsk"
+    ports:
+      - 5433:5432
+    volumes:
+      - pg_test_data:/var/lib/postgresql/data
+    networks:
+      - ido-net
+    profiles: ["test"]
+  redis_test:
+    container_name: users-redis-test
+    restart: unless-stopped
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - 6380:6379
+    volumes:
+      - redis_test_data:/data
+    networks:
+      - ido-net
+    profiles: ["test"]
   app:
     container_name: users-ido-app
     restart: always
@@ -54,6 +87,10 @@ services:
 volumes:
   pg_data:
     name: ido-pg_data
+  pg_test_data:
+    name: ido-pg_test_data
+  redis_test_data:
+    name: ido-redis_test_data
 networks:
   ido-net:
     name: ido-net

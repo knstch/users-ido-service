@@ -16,6 +16,7 @@ import (
 
 func (s *ServiceImpl) mintJWT(userID uint64, role enum.Role) (dto.AccessTokens, error) {
 	timeNow := time.Now()
+	// Access token: signed JWT with user id and role.
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, auth.Claims{
 		UserID: strconv.Itoa(int(userID)),
 		Role:   role.String(),
@@ -30,6 +31,7 @@ func (s *ServiceImpl) mintJWT(userID uint64, role enum.Role) (dto.AccessTokens, 
 		return dto.AccessTokens{}, err
 	}
 
+	// Refresh token: opaque token (sha3 hash) stored server-side.
 	rawRefreshToken := []byte(fmt.Sprintf("%s%d", signedAccessToken, time.Now().Unix()))
 	hash := sha3.New256()
 	_, err = hash.Write(rawRefreshToken)

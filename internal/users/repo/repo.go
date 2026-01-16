@@ -19,11 +19,17 @@ type DBRepo struct {
 }
 
 type Repository interface {
+	// Transaction runs fn inside a database transaction.
 	Transaction(fn func(st Repository) error) error
+	// CreateUser inserts a new user and returns its ID.
 	CreateUser(ctx context.Context, googleSub, email, firstName, lastName, profilePic string) (uint64, error)
+	// CreateAccessTokens inserts access/refresh tokens for a user.
 	CreateAccessTokens(ctx context.Context, accessToken, refreshToken string, userID uint64) error
+	// GetAccessTokens returns a token pair by filter.
 	GetAccessTokens(ctx context.Context, filter filters.AccessTokenFilter) (dto.AccessTokens, error)
+	// GetUser returns a user by filter.
 	GetUser(ctx context.Context, filters filters.UserFilter) (dto.User, error)
+	// UpdateUserMetadata updates name/picture fields for the given user ID.
 	UpdateUserMetadata(ctx context.Context, id uint64, firstName, lastName, profilePic string) error
 }
 

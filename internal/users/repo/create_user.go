@@ -6,6 +6,7 @@ import (
 
 	"github.com/knstch/knstch-libs/tracing"
 
+	"users-service/internal/metrics"
 	"users-service/internal/users/modles"
 )
 
@@ -13,6 +14,7 @@ func (r *DBRepo) CreateUser(ctx context.Context, googleSub, email, firstName, la
 	ctx, span := tracing.StartSpan(ctx, "repo: CreateUser")
 	defer span.End()
 
+	// Insert user record.
 	user := &modles.User{
 		GoogleSub:  googleSub,
 		Email:      email,
@@ -25,5 +27,7 @@ func (r *DBRepo) CreateUser(ctx context.Context, googleSub, email, firstName, la
 		return 0, fmt.Errorf("db.Create: %w", err)
 	}
 
+	// Metric: count newly created users.
+	metrics.IncUsersCreated()
 	return user.ID, nil
 }

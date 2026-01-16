@@ -24,11 +24,17 @@ type ServiceImpl struct {
 }
 
 type Service interface {
+	// AuthViaGoogle returns a Google login URL.
+	// stateURL is the original page URL/path to return to after successful login.
 	AuthViaGoogle(ctx context.Context, stateURL string) (string, error)
+	// CompleteLogin completes the OAuth flow by exchanging `code` for tokens and
+	// issuing service JWTs. It returns tokens and the validated return URL/path.
 	CompleteLogin(ctx context.Context, state, code string) (dto.AccessTokens, string, error)
+	// GetUser returns a user by filter fields.
 	GetUser(ctx context.Context, userToFind dto.GetUser) (dto.User, error)
 }
 
+// NewService constructs the Users service.
 func NewService(
 	lg *log.Logger,
 	repo repo.Repository,

@@ -14,6 +14,7 @@ func (s *ServiceImpl) GetUser(ctx context.Context, userToFind dto.GetUser) (dto.
 	ctx, span := tracing.StartSpan(ctx, "users: GetUser")
 	defer span.End()
 
+	// Delegates filtering to repository scopes.
 	user, err := s.repo.GetUser(ctx, filters.UserFilter{
 		ID:        userToFind.ID,
 		GoogleSub: userToFind.GoogleSub,

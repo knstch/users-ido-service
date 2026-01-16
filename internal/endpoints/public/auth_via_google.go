@@ -16,6 +16,11 @@ func MakeAuthViaGoogleEndpoint(c *Controller) endpoint.Endpoint {
 	}
 }
 
+// AuthViaGoogle is an HTTP endpoint handler that starts Google OAuth.
+//
+// The request field `state` is treated as the return URL/path from which the
+// user initiated login. The response contains a login URL which is then used by
+// the HTTP encoder to perform a redirect.
 func (c *Controller) AuthViaGoogle(ctx context.Context, req *public.AuthViaGoogleRequest) (*public.AuthViaGoogleResponse, error) {
 	ctx, span := tracing.StartSpan(ctx, "public: AuthViaGoogle")
 	defer span.End()

@@ -18,6 +18,7 @@ func (r *DBRepo) GetUser(ctx context.Context, filters filters.UserFilter) (dto.U
 	ctx, span := tracing.StartSpan(ctx, "repo: GetUser")
 	defer span.End()
 
+	// Apply filter scope and return the first matching row.
 	var user modles.User
 	if err := r.db.WithContext(ctx).Scopes(filters.ToScope()).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

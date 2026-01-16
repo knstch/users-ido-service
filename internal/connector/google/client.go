@@ -10,9 +10,11 @@ import (
 )
 
 type Client interface {
+	// ExchangeCodeToToken exchanges an OAuth authorization code for tokens.
 	ExchangeCodeToToken(ctx context.Context, req ExchangeCodeToTokenRequest) (*ExchangeCodeToTokenResponse, error)
 }
 
+// GetClient constructs a Google OAuth connector client.
 func GetClient(cfg *config.Config, lg *log.Logger) (*ClientImpl, error) {
 	httpClient := http.DefaultClient
 

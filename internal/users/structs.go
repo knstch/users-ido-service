@@ -1,5 +1,7 @@
 package users
 
+// OAuthState is encoded into OAuth "state" parameter and later validated on callback.
+// It contains a CSRF token and the original return URL/path.
 type OAuthState struct {
 	CSRF   string `json:"csrf"`
 	Return string `json:"return"`

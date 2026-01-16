@@ -1,0 +1,9 @@
+with-expecter: false
+inpackage: false
+dir: internal/connector/google/mocks
+outpkg: mocks
+packages:
+  users-service/internal/connector/google:
+    interfaces:
+      Client: {}
+

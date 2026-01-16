@@ -44,6 +44,11 @@ func parseOAuthState(state string) (OAuthState, error) {
 	return parsedState, nil
 }
 
+// parseJWTClaimsNoVerify parses claims from a JWT without validating signature.
+//
+// This is used to extract basic identity fields from Google's ID token. For
+// production-grade security, you should validate iss/aud/exp and verify the JWT
+// signature using Google's JWKs.
 func parseJWTClaimsNoVerify(idToken string) (GoogleIDTokenClaims, error) {
 	parts := strings.Split(idToken, ".")
 	if len(parts) != 3 {
@@ -63,6 +68,16 @@ func parseJWTClaimsNoVerify(idToken string) (GoogleIDTokenClaims, error) {
 	return claims, nil
 }
 
+// CompleteLogin completes Google OAuth login.
+//
+// It validates the `state` parameter, verifies CSRF key exists in Redis, deletes
+// the one-time state, exchanges the authorization code for tokens via the Google
+// connector, and then:
+//   - creates or updates the user in Postgres
+//   - mints service access/refresh tokens
+//   - stores tokens in Postgres
+//
+// It returns the minted tokens and the validated return URL/path from state.
 func (s *ServiceImpl) CompleteLogin(ctx context.Context, state, code string) (dto.AccessTokens, string, error) {
 	ctx, span := tracing.StartSpan(ctx, "users: CompleteLogin")
 	defer span.End()

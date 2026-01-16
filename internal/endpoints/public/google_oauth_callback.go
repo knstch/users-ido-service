@@ -17,6 +17,11 @@ func MakeGoogleOAuthCallbackEndpoint(c *Controller) endpoint.Endpoint {
 	}
 }
 
+// GoogleOAuthCallback handles Google's redirect back to the service.
+//
+// It exchanges the `code` for tokens, mints service JWTs and returns a response
+// containing access/refresh tokens and the final redirect URL. The HTTP encoder
+// then sets cookies and performs a redirect to RedirectUrl.
 func (c *Controller) GoogleOAuthCallback(ctx context.Context, req *public.GoogleOAuthCallbackRequest) (*public.GoogleOAuthCallbackResponse, error) {
 	ctx, span := tracing.StartSpan(ctx, "public: GoogleOAuthCallback")
 	defer span.End()
@@ -38,6 +43,9 @@ func (c *Controller) GoogleOAuthCallback(ctx context.Context, req *public.Google
 	}, nil
 }
 
+// buildRedirectURL converts a returnURL (absolute or path) into an absolute URL
+// under platformURL. It is used to redirect the browser to the platform domain
+// after authentication is complete.
 func buildRedirectURL(platformURL string, returnURL string) (string, error) {
 	if returnURL == "" {
 		return "", fmt.Errorf("empty returnURL")

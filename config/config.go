@@ -10,15 +10,21 @@ import (
 )
 
 type Config struct {
+	// JwtSecret is used to sign JWT access tokens.
 	JwtSecret string `envconfig:"JWT_SECRET"`
 
-	JaegerHost  string `envconfig:"JAEGER_HOST" default:"http://localhost:14268/api/traces"`
+	// JaegerHost is the OpenTelemetry Jaeger collector endpoint.
+	JaegerHost string `envconfig:"JAEGER_HOST" default:"http://localhost:14268/api/traces"`
+	// ServiceName is used for logging, tracing and metrics labels.
 	ServiceName string `envconfig:"SERVICE_NAME" default:"service-template"`
 
+	// PublicHTTPAddr is the public HTTP server port.
 	PublicHTTPAddr string `envconfig:"PUBLIC_HTTP_ADDR" default:"8080"`
 
+	// KafkaAddr is the kafka bootstrap address (used by outbox).
 	KafkaAddr string `envconfig:"KAFKA_ADDR" default:"localhost:9092"`
 
+	// PlatformURL is the base URL of the platform allowed for safe redirects.
 	PlatformURL string `envconfig:"PLATFORM_URL"`
 
 	GoogleAPI GoogleAPI
@@ -28,35 +34,50 @@ type Config struct {
 }
 
 type GoogleAPI struct {
-	GoogleAuthHost          string `envconfig:"GOOGLE_AUTH_HOST"`
-	GoogleAPIHost           string `envconfig:"GOOGLE_API_HOST"`
+	// GoogleAuthHost is the Google OAuth authorization endpoint base.
+	GoogleAuthHost string `envconfig:"GOOGLE_AUTH_HOST"`
+	// GoogleAPIHost is the Google OAuth token endpoint base.
+	GoogleAPIHost string `envconfig:"GOOGLE_API_HOST"`
+	// GoogleOAuthClientSecret is the OAuth client secret issued by Google.
 	GoogleOAuthClientSecret string `envconfig:"GOOGLE_OAUTH_CLIENT_SECRET"`
-	GoogleClientID          string `envconfig:"GOOGLE_CLIENT_ID"`
-	GoogleRedirectURI       string `envconfig:"GOOGLE_REDIRECT_URI"`
+	// GoogleClientID is the OAuth client ID issued by Google.
+	GoogleClientID string `envconfig:"GOOGLE_CLIENT_ID"`
+	// GoogleRedirectURI is the callback URL registered in Google OAuth settings.
+	GoogleRedirectURI string `envconfig:"GOOGLE_REDIRECT_URI"`
 }
 
 type DBConfig struct {
-	Host     string `envconfig:"PG_HOST"`
-	Port     string `envconfig:"PG_PORT"`
-	User     string `envconfig:"PG_USER"`
+	// Host is the database host.
+	Host string `envconfig:"PG_HOST"`
+	// Port is the database port.
+	Port string `envconfig:"PG_PORT"`
+	// User is the database user.
+	User string `envconfig:"PG_USER"`
+	// Password is the database password.
 	Password string `envconfig:"PG_PASSWORD"`
 }
 
 type RedisConfig struct {
-	Host     string `envconfig:"REDIS_HOST"`
-	Port     string `envconfig:"REDIS_PORT"`
+	// Host is the redis host.
+	Host string `envconfig:"REDIS_HOST"`
+	// Port is the redis port.
+	Port string `envconfig:"REDIS_PORT"`
+	// Password is the redis password.
 	Password string `envconfig:"REDIS_PASSWORD"`
 }
 
+// GetDSN returns a postgres DSN for gorm/pgx.
 func (cfg *Config) GetDSN() string {
 	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		cfg.DBConfig.User, cfg.DBConfig.Password, cfg.DBConfig.Host, cfg.DBConfig.Port, cfg.DBConfig.User)
 }
 
+// GetRedisDSN returns a redis URI.
 func (cfg *Config) GetRedisDSN() string {
 	return fmt.Sprintf("redis://:%s@%s:%s/0", cfg.RedisConfig.Password, cfg.RedisConfig.Host, cfg.RedisConfig.Port)
 }
 
+// GetConfig reads environment variables and returns the parsed Config.
 func GetConfig() (*Config, error) {
 	config := &Config{}
 
@@ -68,6 +89,7 @@ func GetConfig() (*Config, error) {
 	return config, nil
 }
 
+// InitENV loads `.env.local` (optional) and `.env` (required) from the given directory.
 func InitENV(dir string) error {
 	if err := godotenv.Load(filepath.Join(dir, ".env.local")); err != nil {
 		if !os.IsNotExist(err) {

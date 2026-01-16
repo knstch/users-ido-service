@@ -8,6 +8,9 @@ import (
 	public "github.com/knstch/users-ido-api/public"
 )
 
+// EncodeAuthViaGoogleResponse redirects the browser to Google login URL.
+//
+// It writes HTTP 302 and the Location header. No JSON body is written.
 func EncodeAuthViaGoogleResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	resp, ok := response.(*public.AuthViaGoogleResponse)
 	if !ok {

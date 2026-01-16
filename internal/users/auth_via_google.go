@@ -21,6 +21,11 @@ const (
 	authExpirationTime = time.Minute * 15
 )
 
+// AuthViaGoogle starts Google OAuth authorization flow.
+//
+// It validates the provided stateURL (return URL/path) against cfg.PlatformURL,
+// generates a CSRF token, stores it in Redis with a TTL, and returns a Google
+// authorization URL containing the encoded state.
 func (s *ServiceImpl) AuthViaGoogle(ctx context.Context, stateURL string) (string, error) {
 	ctx, span := tracing.StartSpan(ctx, "users: AuthViaGoogle")
 	defer span.End()
@@ -54,7 +59,6 @@ func (s *ServiceImpl) AuthViaGoogle(ctx context.Context, stateURL string) (strin
 		return "", err
 	}
 
-	// Store the return URL server-side to prevent tampering (client can modify the `state` param).
 	if err = s.redis.Set(ctx, "oauth:state:"+securityCode, stateURL, authExpirationTime).Err(); err != nil {
 		return "", fmt.Errorf("redis.Set: %w", err)
 	}
@@ -62,6 +66,13 @@ func (s *ServiceImpl) AuthViaGoogle(ctx context.Context, stateURL string) (strin
 	return loginURL, nil
 }
 
+// buildGoogleAuthURL builds the Google authorization URL.
+//
+// Parameters:
+// - clientID: Google OAuth client_id
+// - redirectURI: callback URL (GOOGLE_REDIRECT_URI)
+// - state: opaque state string (base64url JSON with CSRF + return URL)
+// - authURL: base authorization endpoint (GOOGLE_AUTH_HOST)
 func buildGoogleAuthURL(clientID, redirectURI, state, authURL string) (string, error) {
 	if clientID == "" {
 		return "", fmt.Errorf("client_id is required: %w", svcerrs.ErrInvalidData)
