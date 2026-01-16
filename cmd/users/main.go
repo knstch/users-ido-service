@@ -9,13 +9,18 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/knstch/knstch-libs/endpoints"
 	"github.com/knstch/knstch-libs/log"
 	"github.com/knstch/knstch-libs/tracing"
+	"github.com/redis/go-redis/v9"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 
 	"users-service/config"
+	"users-service/internal/connector/google"
 	"users-service/internal/endpoints/public"
 	"users-service/internal/users"
 	"users-service/internal/users/repo"
@@ -50,10 +55,39 @@ func run() error {
 
 	logger := log.NewLogger(cfg.ServiceName, log.InfoLevel)
 
-	// Template repository: keep the app runnable without external dependencies.
-	// Replace NoopRepo with a real DB repo in your generated service.
-	dbRepo := repo.NewNoopRepo()
-	svc := users.NewService(logger, dbRepo, *cfg)
+	db, err := gorm.Open(postgres.Open(cfg.GetDSN()), &gorm.Config{})
+	if err != nil {
+		return fmt.Errorf("gorm.Open: %w", err)
+	}
+
+	dbRepo, err := repo.NewDBRepo(logger, db)
+	if err != nil {
+		return fmt.Errorf("repo.NewDBRepo: %w", err)
+	}
+
+	googleClient, err := google.GetClient(cfg, logger)
+	if err != nil {
+		return fmt.Errorf("google.GetClient: %w", err)
+	}
+
+	redisHost := cfg.RedisConfig.Host
+	if redisHost == "" {
+		redisHost = "localhost"
+	}
+	redisPort := cfg.RedisConfig.Port
+	if redisPort == "" {
+		redisPort = os.Getenv("REDIS_EXTERNAL_PORT")
+	}
+	if redisPort == "" {
+		redisPort = "6379"
+	}
+	redisAddr := strings.TrimSpace(redisHost) + ":" + strings.TrimSpace(redisPort)
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     redisAddr,
+		Password: cfg.RedisConfig.Password,
+	})
+
+	svc := users.NewService(logger, dbRepo, *cfg, googleClient, redisClient)
 
 	publicController := public.NewController(svc, logger, cfg)
 	publicEndpoints := endpoints.InitHttpEndpoints(cfg.ServiceName, publicController.Endpoints())
