@@ -6,12 +6,14 @@ toolchain go1.24.11
 
 require (
 	github.com/go-kit/kit v0.13.0
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/jackc/pgx/v5 v5.7.4
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/knstch/knstch-ido-kafka v1.0.0
-	github.com/knstch/knstch-libs v1.0.0
-	github.com/knstch/template-api v1.0.1
+	github.com/knstch/knstch-libs v1.1.0
+	github.com/knstch/trader-libs v0.3.6
+	github.com/knstch/users-ido-api v0.0.4
 	github.com/pressly/goose/v3 v3.24.2
 	github.com/redis/go-redis/v9 v9.17.2
 	gorm.io/driver/postgres v1.5.11
@@ -27,7 +29,7 @@ require (
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
+	github.com/go-playground/form/v4 v4.3.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
@@ -35,7 +37,6 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
-	github.com/knstch/trader-libs v0.3.6 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/pierrec/lz4/v4 v4.1.22 // indirect

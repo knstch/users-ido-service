@@ -5,13 +5,15 @@ import (
 	"fmt"
 
 	"github.com/knstch/knstch-libs/tracing"
+
+	"users-service/internal/users/modles"
 )
 
 func (r *DBRepo) CreateUser(ctx context.Context, googleSub, email, firstName, lastName, profilePic string) (uint64, error) {
-	ctx, span := tracing.StartSpan(ctx, "repo: GetPassword")
+	ctx, span := tracing.StartSpan(ctx, "repo: CreateUser")
 	defer span.End()
 
-	user := &User{
+	user := &modles.User{
 		GoogleSub:  googleSub,
 		Email:      email,
 		FirstName:  firstName,
@@ -19,7 +21,7 @@ func (r *DBRepo) CreateUser(ctx context.Context, googleSub, email, firstName, la
 		ProfilePic: profilePic,
 	}
 
-	if err := r.db.WithContext(ctx).Model(&User{}).Create(user).Error; err != nil {
+	if err := r.db.WithContext(ctx).Model(&modles.User{}).Create(user).Error; err != nil {
 		return 0, fmt.Errorf("db.Create: %w", err)
 	}
 

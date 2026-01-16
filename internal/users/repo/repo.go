@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 
 	"users-service/internal/domain/dto"
+	"users-service/internal/users/filters"
 )
 
 type DBRepo struct {
@@ -21,8 +22,8 @@ type Repository interface {
 	Transaction(fn func(st Repository) error) error
 	CreateUser(ctx context.Context, googleSub, email, firstName, lastName, profilePic string) (uint64, error)
 	CreateAccessTokens(ctx context.Context, accessToken, refreshToken string, userID uint64) error
-	GetAccessTokens(ctx context.Context, filter AccessTokenFilter) (dto.AccessTokens, error)
-	GetUser(ctx context.Context, filters UserFilter) (dto.User, error)
+	GetAccessTokens(ctx context.Context, filter filters.AccessTokenFilter) (dto.AccessTokens, error)
+	GetUser(ctx context.Context, filters filters.UserFilter) (dto.User, error)
 	UpdateUserMetadata(ctx context.Context, id uint64, firstName, lastName, profilePic string) error
 }
 

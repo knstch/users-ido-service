@@ -8,14 +8,16 @@ import (
 	"github.com/knstch/knstch-libs/svcerrs"
 	"github.com/knstch/knstch-libs/tracing"
 	"gorm.io/gorm"
+
+	"users-service/internal/users/modles"
 )
 
 func (r *DBRepo) UpdateUserMetadata(ctx context.Context, id uint64, firstName, lastName, profilePic string) error {
 	ctx, span := tracing.StartSpan(ctx, "repo: UpdateUserMetadata")
 	defer span.End()
 
-	var user User
-	if err := r.db.WithContext(ctx).Model(&User{}).Where("id = ?", id).First(&user).Error; err != nil {
+	var user modles.User
+	if err := r.db.WithContext(ctx).Model(&modles.User{}).Where("id = ?", id).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return fmt.Errorf("db.First: %w", svcerrs.ErrDataNotFound)
 		}

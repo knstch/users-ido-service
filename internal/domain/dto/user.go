@@ -8,3 +8,12 @@ type User struct {
 	Email          string
 	ProfilePicture string
 }
+
+type GetUser struct {
+	ID             uint64
+	GoogleSub      string
+	FirstName      string
+	LastName       string
+	Email          string
+	ProfilePicture string
+}

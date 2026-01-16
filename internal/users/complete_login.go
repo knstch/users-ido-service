@@ -15,6 +15,7 @@ import (
 	"users-service/internal/connector/google"
 	"users-service/internal/domain/dto"
 	"users-service/internal/domain/enum"
+	"users-service/internal/users/filters"
 	"users-service/internal/users/repo"
 )
 
@@ -25,7 +26,7 @@ func parseOAuthState(state string) (OAuthState, error) {
 
 	raw, err := base64.RawURLEncoding.DecodeString(state)
 	if err != nil {
-		return OAuthState{}, fmt.Errorf("base64.RawURLEncoding.DecodeStringe: %w", err)
+		return OAuthState{}, fmt.Errorf("base64.RawURLEncoding.DecodeString: %w", err)
 	}
 
 	var parsedState OAuthState
@@ -62,35 +63,43 @@ func parseJWTClaimsNoVerify(idToken string) (GoogleIDTokenClaims, error) {
 	return claims, nil
 }
 
-func (s *ServiceImpl) CompleteLogin(ctx context.Context, state, code string) (dto.AccessTokens, error) {
+func (s *ServiceImpl) CompleteLogin(ctx context.Context, state, code string) (dto.AccessTokens, string, error) {
 	ctx, span := tracing.StartSpan(ctx, "users: CompleteLogin")
 	defer span.End()
 
 	parsedState, err := parseOAuthState(state)
 	if err != nil {
-		return dto.AccessTokens{}, err
+		return dto.AccessTokens{}, "", err
 	}
 
-	if err = s.redis.Get(ctx, parsedState.CSRF).Err(); err != nil {
+	stateKey := "oauth:state:" + parsedState.CSRF
+	returnURL, err := s.redis.Get(ctx, stateKey).Result()
+	if err != nil {
 		if errors.Is(err, redis.Nil) {
-			return dto.AccessTokens{}, fmt.Errorf("CSRF token not found")
+			return dto.AccessTokens{}, "", fmt.Errorf("CSRF token not found")
 		}
-		return dto.AccessTokens{}, fmt.Errorf("redis.Get: %w", err)
+		return dto.AccessTokens{}, "", fmt.Errorf("redis.Get: %w", err)
 	}
+
+	if returnURL != parsedState.Return {
+		return dto.AccessTokens{}, "", fmt.Errorf("state mismatch: %w", svcerrs.ErrInvalidData)
+	}
+
+	_ = s.redis.Del(ctx, stateKey).Err()
 
 	resp, err := s.google.ExchangeCodeToToken(ctx, google.ExchangeCodeToTokenRequest{
 		ClientSecret:   s.cfg.GoogleAPI.GoogleOAuthClientSecret,
 		Code:           code,
 		GoogleClientID: s.cfg.GoogleAPI.GoogleClientID,
-		RedirectURI:    parsedState.Return,
+		RedirectURI:    s.cfg.GoogleAPI.GoogleRedirectURI,
 	})
 	if err != nil {
-		return dto.AccessTokens{}, fmt.Errorf("google.ExchangeCodeToToken: %w", err)
+		return dto.AccessTokens{}, "", fmt.Errorf("google.ExchangeCodeToToken: %w", err)
 	}
 
 	claims, err := parseJWTClaimsNoVerify(resp.IDToken)
 	if err != nil {
-		return dto.AccessTokens{}, fmt.Errorf("parseJWTClaimsNoVerify: %w", err)
+		return dto.AccessTokens{}, "", fmt.Errorf("parseJWTClaimsNoVerify: %w", err)
 	}
 
 	fullName := strings.Split(claims.Name, " ")
@@ -106,18 +115,20 @@ func (s *ServiceImpl) CompleteLogin(ctx context.Context, state, code string) (dt
 
 	userExists := true
 	userHasToBeUpdated := false
-	user, err := s.repo.GetUser(ctx, repo.UserFilter{
+	user, err := s.repo.GetUser(ctx, filters.UserFilter{
 		Email: claims.Email,
 	})
 	if err != nil {
 		if errors.Is(err, svcerrs.ErrDataNotFound) {
 			userExists = false
 		} else {
-			return dto.AccessTokens{}, fmt.Errorf("repo.GetUser: %w", err)
+			return dto.AccessTokens{}, "", fmt.Errorf("repo.GetUser: %w", err)
 		}
 	}
-	if user.FirstName != firstName || user.LastName != lastName || user.ProfilePicture != claims.Picture {
-		userHasToBeUpdated = true
+	if userExists {
+		if user.FirstName != firstName || user.LastName != lastName || user.ProfilePicture != claims.Picture {
+			userHasToBeUpdated = true
+		}
 	}
 
 	var accessTokens dto.AccessTokens
@@ -149,8 +160,8 @@ func (s *ServiceImpl) CompleteLogin(ctx context.Context, state, code string) (dt
 
 		return nil
 	}); err != nil {
-		return dto.AccessTokens{}, fmt.Errorf("repo.Transaction: %w", err)
+		return dto.AccessTokens{}, "", fmt.Errorf("repo.Transaction: %w", err)
 	}
 
-	return accessTokens, nil
+	return accessTokens, parsedState.Return, nil
 }

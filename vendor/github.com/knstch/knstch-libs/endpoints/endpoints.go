@@ -7,10 +7,10 @@ import (
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"github.com/knstch/trader-libs/middleware"
-	metrics "github.com/knstch/trader-libs/prometeus"
-	"github.com/knstch/trader-libs/tracing"
-	"github.com/knstch/trader-libs/transport"
+	"github.com/knstch/knstch-libs/middleware"
+	metrics "github.com/knstch/knstch-libs/prometeus"
+	"github.com/knstch/knstch-libs/tracing"
+	"github.com/knstch/knstch-libs/transport"
 
 	"github.com/go-chi/chi/v5"
 )

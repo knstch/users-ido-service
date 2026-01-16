@@ -54,7 +54,8 @@ func (s *ServiceImpl) AuthViaGoogle(ctx context.Context, stateURL string) (strin
 		return "", err
 	}
 
-	if err = s.redis.Set(ctx, "oauth:state:"+securityCode, 1, authExpirationTime).Err(); err != nil {
+	// Store the return URL server-side to prevent tampering (client can modify the `state` param).
+	if err = s.redis.Set(ctx, "oauth:state:"+securityCode, stateURL, authExpirationTime).Err(); err != nil {
 		return "", fmt.Errorf("redis.Set: %w", err)
 	}
 

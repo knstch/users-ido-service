@@ -10,13 +10,15 @@ import (
 	"gorm.io/gorm"
 
 	"users-service/internal/domain/dto"
+	"users-service/internal/users/filters"
+	"users-service/internal/users/modles"
 )
 
-func (r *DBRepo) GetUser(ctx context.Context, filters UserFilter) (dto.User, error) {
+func (r *DBRepo) GetUser(ctx context.Context, filters filters.UserFilter) (dto.User, error) {
 	ctx, span := tracing.StartSpan(ctx, "repo: GetUser")
 	defer span.End()
 
-	var user User
+	var user modles.User
 	if err := r.db.WithContext(ctx).Scopes(filters.ToScope()).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return dto.User{}, fmt.Errorf("db.First: %w", svcerrs.ErrDataNotFound)

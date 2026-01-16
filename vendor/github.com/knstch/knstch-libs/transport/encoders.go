@@ -6,7 +6,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/knstch/trader-libs/svcerrs"
+	"github.com/knstch/knstch-libs/svcerrs"
 )
 
 func mapErrorToStatus(err error) int {
