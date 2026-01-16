@@ -71,19 +71,11 @@ func run() error {
 	}
 
 	redisHost := cfg.RedisConfig.Host
-	if redisHost == "" {
-		redisHost = "localhost"
-	}
 	redisPort := cfg.RedisConfig.Port
-	if redisPort == "" {
-		redisPort = os.Getenv("REDIS_EXTERNAL_PORT")
-	}
-	if redisPort == "" {
-		redisPort = "6379"
-	}
 	redisAddr := strings.TrimSpace(redisHost) + ":" + strings.TrimSpace(redisPort)
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:     redisAddr,
+		Username: cfg.RedisConfig.Username,
 		Password: cfg.RedisConfig.Password,
 	})
 

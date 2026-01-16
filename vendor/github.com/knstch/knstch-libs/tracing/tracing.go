@@ -17,6 +17,12 @@ import (
 
 var tracer trace.Tracer
 
+func init() {
+	// Default to a no-op tracer so StartSpan/WithTracing won't panic in tests
+	// or binaries that don't call InitTracer.
+	tracer = otel.Tracer("noop")
+}
+
 func InitTracer(serviceName, jaegerHost string) func(ctx context.Context) error {
 	exp, err := jaeger.New(
 		jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(jaegerHost)),

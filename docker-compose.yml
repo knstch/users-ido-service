@@ -25,6 +25,25 @@ services:
       - pg_data:/var/lib/postgresql/data
     networks:
       - ido-net
+  redis:
+    container_name: users-ido-redis
+    restart: always
+    build:
+      context: docker/redis
+      dockerfile: redis.Dockerfile
+      args:
+        REDIS_PASSWORD: ${REDIS_PASSWORD}
+    image: redis:latest
+    ports:
+      - ${REDIS_EXTERNAL_PORT:-6379}:6379
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_USERNAME: ${REDIS_USERNAME}
+    volumes:
+      - redis_data:/data
+    command: [ "redis-server", "--requirepass", "password" ]
+    networks:
+      - ido-net
   postgres_test:
     container_name: users-postgres-test
     restart: unless-stopped
@@ -36,8 +55,11 @@ services:
     env_file:
       - test.env
     environment:
-      POSTGRES_USER: ${PG_USER}
-      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      # For compose variable interpolation, env_file is NOT used.
+      # Keep test DB creds explicit so the container is deterministic.
+      POSTGRES_USER: users_test
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: users_test
       TZ: "Asia/Novosibirsk"
     ports:
       - 5433:5432
@@ -91,6 +113,8 @@ volumes:
     name: ido-pg_test_data
   redis_test_data:
     name: ido-redis_test_data
+  redis_data:
+    name: ido-redis_data
 networks:
   ido-net:
     name: ido-net

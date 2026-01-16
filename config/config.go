@@ -62,6 +62,8 @@ type RedisConfig struct {
 	Host string `envconfig:"REDIS_HOST"`
 	// Port is the redis port.
 	Port string `envconfig:"REDIS_PORT"`
+	// Username is the redis username (ACL). If empty, the "default" user is used.
+	Username string `envconfig:"REDIS_USERNAME"`
 	// Password is the redis password.
 	Password string `envconfig:"REDIS_PASSWORD"`
 }

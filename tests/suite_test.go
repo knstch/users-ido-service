@@ -44,7 +44,8 @@ func (s *UsersServiceTestSuite) SetupSuite() {
 	// Load .env and then override with test.env (tests should always prefer test creds).
 	root := mustFindRepoRoot(t)
 	t.NoError(config.InitENV(root))
-	_ = godotenv.Overload(filepath.Join(root, "test.env"))
+	err := godotenv.Overload(filepath.Join(root, "test.env"))
+	t.NoError(err)
 
 	cfgPtr, err := config.GetConfig()
 	t.NoError(err)
@@ -80,10 +81,16 @@ func (s *UsersServiceTestSuite) SetupSuite() {
 
 	s.rdb = redis.NewClient(&redis.Options{
 		Addr:     cfg.RedisConfig.Host + ":" + cfg.RedisConfig.Port,
+		Username: cfg.RedisConfig.Username,
 		Password: cfg.RedisConfig.Password,
 	})
 	if err := s.rdb.Ping(context.Background()).Err(); err != nil {
-		s.T().Skipf("redis is not available for tests: %v", err)
+		s.T().Skipf(
+			"redis is not available for tests: %v (addr=%s password_len=%d)",
+			err,
+			cfg.RedisConfig.Host+":"+cfg.RedisConfig.Port,
+			len(cfg.RedisConfig.Password),
+		)
 	}
 
 	logger := newTestLogger(cfg.ServiceName)
