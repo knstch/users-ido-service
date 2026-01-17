@@ -25,7 +25,7 @@ func (c *Controller) AuthViaGoogle(ctx context.Context, req *public.AuthViaGoogl
 	ctx, span := tracing.StartSpan(ctx, "public: AuthViaGoogle")
 	defer span.End()
 
-	loginURL, err := c.svc.AuthViaGoogle(ctx, req.GetState())
+	loginURL, err := c.svc.AuthViaGoogle(ctx, req.GetLocation())
 	if err != nil {
 		return nil, fmt.Errorf("svc.AuthViaGoogle: %w", err)
 	}

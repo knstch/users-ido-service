@@ -26,7 +26,7 @@ services:
     networks:
       - ido-net
   redis:
-    container_name: users-ido-redis
+    container_name: users-redis
     restart: always
     build:
       context: docker/redis
@@ -89,23 +89,21 @@ services:
       args:
         PORT: ${PUBLIC_HTTP_ADDR}
     image: users-ido-app:latest
+    env_file:
+      - .env
     environment:
       - TZ=Asia/Novosibirsk
+      - REDIS_HOST=users-redis
+      - REDIS_PORT=6379
+      - REDIS_USERNAME=${REDIS_USERNAME}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     ports:
       - ${PUBLIC_HTTP_ADDR}:${PUBLIC_HTTP_ADDR}
     networks:
       - ido-net
-  outbox:
-    container_name: outbox
-    restart: always
-    build:
-      context: .
-      dockerfile: docker/go-outbox/go.Dockerfile
-    image: outbox-app:latest
-    environment:
-      - TZ=Asia/Novosibirsk
-    networks:
-      - ido-net
+    depends_on:
+      - redis
+      - postgres
 volumes:
   pg_data:
     name: ido-pg_data

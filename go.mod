@@ -12,8 +12,9 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/knstch/knstch-libs v1.1.0
 	github.com/knstch/trader-libs v0.3.6
-	github.com/knstch/users-ido-api v0.0.4
+	github.com/knstch/users-ido-api v0.0.5
 	github.com/pressly/goose/v3 v3.24.2
+	github.com/prometheus/client_golang v1.23.2
 	github.com/redis/go-redis/v9 v9.17.2
 	github.com/stretchr/testify v1.11.1
 	gorm.io/driver/postgres v1.5.11
@@ -40,7 +41,6 @@ require (
 	github.com/mfridman/interpolate v0.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/prometheus/client_golang v1.23.2 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.66.1 // indirect
 	github.com/prometheus/procfs v0.16.1 // indirect

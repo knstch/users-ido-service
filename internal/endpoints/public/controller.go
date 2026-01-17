@@ -2,6 +2,7 @@ package public
 
 import (
 	"net/http"
+	"users-service/internal/endpoints/decoder"
 
 	"users-service/config"
 	"users-service/internal/endpoints/encoder"
@@ -12,7 +13,6 @@ import (
 	public "github.com/knstch/users-ido-api/public"
 
 	"github.com/knstch/knstch-libs/endpoints"
-	"github.com/knstch/knstch-libs/transport"
 )
 
 type Controller struct {
@@ -37,14 +37,14 @@ func (c *Controller) Endpoints() []endpoints.Endpoint {
 			Method:  http.MethodGet,
 			Path:    "/authViaGoogle",
 			Handler: MakeAuthViaGoogleEndpoint(c),
-			Decoder: transport.DecodeQueryRequest[public.AuthViaGoogleRequest],
+			Decoder: decoder.DecodeAuthViaGoogleRequest,
 			Encoder: encoder.EncodeAuthViaGoogleResponse,
 		},
 		{
 			Method:  http.MethodGet,
 			Path:    "/googleOAuthCallback",
 			Handler: MakeGoogleOAuthCallbackEndpoint(c),
-			Decoder: transport.DecodeQueryRequest[public.GoogleOAuthCallbackRequest],
+			Decoder: decoder.DecodeGoogleOAuthCallbackRequest,
 			Encoder: encoder.EncodeGoogleOAuthCallbackResponse,
 		},
 	}

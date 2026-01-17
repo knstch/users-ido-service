@@ -92,7 +92,7 @@ github.com/knstch/knstch-libs/transport
 # github.com/knstch/trader-libs v0.3.6
 ## explicit; go 1.24.3
 github.com/knstch/trader-libs/auth
-# github.com/knstch/users-ido-api v0.0.4
+# github.com/knstch/users-ido-api v0.0.5
 ## explicit; go 1.24.1
 github.com/knstch/users-ido-api/public
 # github.com/mfridman/interpolate v0.0.2

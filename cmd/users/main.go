@@ -9,7 +9,6 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/knstch/knstch-libs/endpoints"
@@ -70,14 +69,11 @@ func run() error {
 		return fmt.Errorf("google.GetClient: %w", err)
 	}
 
-	redisHost := cfg.RedisConfig.Host
-	redisPort := cfg.RedisConfig.Port
-	redisAddr := strings.TrimSpace(redisHost) + ":" + strings.TrimSpace(redisPort)
-	redisClient := redis.NewClient(&redis.Options{
-		Addr:     redisAddr,
-		Username: cfg.RedisConfig.Username,
-		Password: cfg.RedisConfig.Password,
-	})
+	dsnRedis, err := redis.ParseURL(cfg.GetRedisDSN())
+	if err != nil {
+		return err
+	}
+	redisClient := redis.NewClient(dsnRedis)
 
 	svc := users.NewService(logger, dbRepo, *cfg, googleClient, redisClient)
 

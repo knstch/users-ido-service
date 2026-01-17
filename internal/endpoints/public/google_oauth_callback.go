@@ -51,10 +51,12 @@ func buildRedirectURL(platformURL string, returnURL string) (string, error) {
 		return "", fmt.Errorf("empty returnURL")
 	}
 
+	// If returnURL is already an absolute URL, return it as-is
 	if strings.HasPrefix(returnURL, "http://") || strings.HasPrefix(returnURL, "https://") {
 		return returnURL, nil
 	}
 
+	// Parse platformURL to get base scheme and host
 	base, err := url.Parse(platformURL)
 	if err != nil {
 		return "", fmt.Errorf("url.Parse: %w", err)
@@ -63,11 +65,14 @@ func buildRedirectURL(platformURL string, returnURL string) (string, error) {
 		return "", fmt.Errorf("invalid platformURL")
 	}
 
+	// Ensure returnURL starts with /
 	if !strings.HasPrefix(returnURL, "/") {
 		returnURL = "/" + returnURL
 	}
 
-	base.Path = strings.TrimRight(base.Path, "/") + returnURL
+	// Build the absolute URL: scheme://host/path
+	// Replace the path completely, don't append to base.Path
+	base.Path = returnURL
 	base.RawQuery = ""
 	base.Fragment = ""
 	return base.String(), nil

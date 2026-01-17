@@ -8,7 +8,8 @@ service Users {
 }
 
 message AuthViaGoogleRequest {
-  string state = 1;
+  reserved 1;
+  string location = 2;
 }
 
 message AuthViaGoogleResponse {

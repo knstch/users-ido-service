@@ -20,7 +20,7 @@ type GoogleOAuthCallbackHTTPResponse struct {
 //
 // It sets HttpOnly cookies for access/refresh tokens and returns HTTP 302 with
 // Location pointing to RedirectUrl. No JSON body is written.
-func EncodeGoogleOAuthCallbackResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+func EncodeGoogleOAuthCallbackResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	resp, ok := response.(*public.GoogleOAuthCallbackResponse)
 	if !ok {
 		return fmt.Errorf("unexpected response type %T", response)
