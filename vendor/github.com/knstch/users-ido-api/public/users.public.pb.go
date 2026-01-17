@@ -245,6 +245,230 @@ func (x *GoogleOAuthCallbackResponse) GetRedirectUrl() string {
 	return ""
 }
 
+type RefreshAccessTokenRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RefreshToken  string                 `protobuf:"bytes,1,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RefreshAccessTokenRequest) Reset() {
+	*x = RefreshAccessTokenRequest{}
+	mi := &file_users_public_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RefreshAccessTokenRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RefreshAccessTokenRequest) ProtoMessage() {}
+
+func (x *RefreshAccessTokenRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_users_public_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RefreshAccessTokenRequest.ProtoReflect.Descriptor instead.
+func (*RefreshAccessTokenRequest) Descriptor() ([]byte, []int) {
+	return file_users_public_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *RefreshAccessTokenRequest) GetRefreshToken() string {
+	if x != nil {
+		return x.RefreshToken
+	}
+	return ""
+}
+
+type RefreshAccessTokenResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AccessToken   string                 `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
+	RefreshToken  string                 `protobuf:"bytes,2,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RefreshAccessTokenResponse) Reset() {
+	*x = RefreshAccessTokenResponse{}
+	mi := &file_users_public_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RefreshAccessTokenResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RefreshAccessTokenResponse) ProtoMessage() {}
+
+func (x *RefreshAccessTokenResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_users_public_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RefreshAccessTokenResponse.ProtoReflect.Descriptor instead.
+func (*RefreshAccessTokenResponse) Descriptor() ([]byte, []int) {
+	return file_users_public_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *RefreshAccessTokenResponse) GetAccessToken() string {
+	if x != nil {
+		return x.AccessToken
+	}
+	return ""
+}
+
+func (x *RefreshAccessTokenResponse) GetRefreshToken() string {
+	if x != nil {
+		return x.RefreshToken
+	}
+	return ""
+}
+
+type GetUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ID            uint64                 `protobuf:"varint,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetUserRequest) Reset() {
+	*x = GetUserRequest{}
+	mi := &file_users_public_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUserRequest) ProtoMessage() {}
+
+func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_users_public_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUserRequest.ProtoReflect.Descriptor instead.
+func (*GetUserRequest) Descriptor() ([]byte, []int) {
+	return file_users_public_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GetUserRequest) GetID() uint64 {
+	if x != nil {
+		return x.ID
+	}
+	return 0
+}
+
+func (x *GetUserRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+type GetUserResponse struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	ID             uint64                 `protobuf:"varint,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Email          string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	FirstName      string                 `protobuf:"bytes,3,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
+	LastName       string                 `protobuf:"bytes,4,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
+	ProfilePicture string                 `protobuf:"bytes,5,opt,name=profile_picture,json=profilePicture,proto3" json:"profile_picture,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *GetUserResponse) Reset() {
+	*x = GetUserResponse{}
+	mi := &file_users_public_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetUserResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUserResponse) ProtoMessage() {}
+
+func (x *GetUserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_users_public_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUserResponse.ProtoReflect.Descriptor instead.
+func (*GetUserResponse) Descriptor() ([]byte, []int) {
+	return file_users_public_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *GetUserResponse) GetID() uint64 {
+	if x != nil {
+		return x.ID
+	}
+	return 0
+}
+
+func (x *GetUserResponse) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *GetUserResponse) GetFirstName() string {
+	if x != nil {
+		return x.FirstName
+	}
+	return ""
+}
+
+func (x *GetUserResponse) GetLastName() string {
+	if x != nil {
+		return x.LastName
+	}
+	return ""
+}
+
+func (x *GetUserResponse) GetProfilePicture() string {
+	if x != nil {
+		return x.ProfilePicture
+	}
+	return ""
+}
+
 var File_users_public_proto protoreflect.FileDescriptor
 
 const file_users_public_proto_rawDesc = "" +
@@ -263,10 +487,27 @@ const file_users_public_proto_rawDesc = "" +
 	"\x1bGoogleOAuthCallbackResponse\x12!\n" +
 	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12#\n" +
 	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\x12!\n" +
-	"\fredirect_url\x18\x03 \x01(\tR\vredirectUrl2\xcd\x01\n" +
+	"\fredirect_url\x18\x03 \x01(\tR\vredirectUrl\"@\n" +
+	"\x19RefreshAccessTokenRequest\x12#\n" +
+	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"d\n" +
+	"\x1aRefreshAccessTokenResponse\x12!\n" +
+	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12#\n" +
+	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\"6\n" +
+	"\x0eGetUserRequest\x12\x0e\n" +
+	"\x02ID\x18\x01 \x01(\x04R\x02ID\x12\x14\n" +
+	"\x05email\x18\x02 \x01(\tR\x05email\"\x9c\x01\n" +
+	"\x0fGetUserResponse\x12\x0e\n" +
+	"\x02ID\x18\x01 \x01(\x04R\x02ID\x12\x14\n" +
+	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1d\n" +
+	"\n" +
+	"first_name\x18\x03 \x01(\tR\tfirstName\x12\x1b\n" +
+	"\tlast_name\x18\x04 \x01(\tR\blastName\x12'\n" +
+	"\x0fprofile_picture\x18\x05 \x01(\tR\x0eprofilePicture2\xfe\x02\n" +
 	"\x05Users\x12X\n" +
 	"\rAuthViaGoogle\x12\".users.public.AuthViaGoogleRequest\x1a#.users.public.AuthViaGoogleResponse\x12j\n" +
-	"\x13GoogleOAuthCallback\x12(.users.public.GoogleOAuthCallbackRequest\x1a).users.public.GoogleOAuthCallbackResponseB\x04Z\x02./b\x06proto3"
+	"\x13GoogleOAuthCallback\x12(.users.public.GoogleOAuthCallbackRequest\x1a).users.public.GoogleOAuthCallbackResponse\x12g\n" +
+	"\x12RefreshAccessToken\x12'.users.public.RefreshAccessTokenRequest\x1a(.users.public.RefreshAccessTokenResponse\x12F\n" +
+	"\aGetUser\x12\x1c.users.public.GetUserRequest\x1a\x1d.users.public.GetUserResponseB\x04Z\x02./b\x06proto3"
 
 var (
 	file_users_public_proto_rawDescOnce sync.Once
@@ -280,20 +521,28 @@ func file_users_public_proto_rawDescGZIP() []byte {
 	return file_users_public_proto_rawDescData
 }
 
-var file_users_public_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_users_public_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_users_public_proto_goTypes = []any{
 	(*AuthViaGoogleRequest)(nil),        // 0: users.public.AuthViaGoogleRequest
 	(*AuthViaGoogleResponse)(nil),       // 1: users.public.AuthViaGoogleResponse
 	(*GoogleOAuthCallbackRequest)(nil),  // 2: users.public.GoogleOAuthCallbackRequest
 	(*GoogleOAuthCallbackResponse)(nil), // 3: users.public.GoogleOAuthCallbackResponse
+	(*RefreshAccessTokenRequest)(nil),   // 4: users.public.RefreshAccessTokenRequest
+	(*RefreshAccessTokenResponse)(nil),  // 5: users.public.RefreshAccessTokenResponse
+	(*GetUserRequest)(nil),              // 6: users.public.GetUserRequest
+	(*GetUserResponse)(nil),             // 7: users.public.GetUserResponse
 }
 var file_users_public_proto_depIdxs = []int32{
 	0, // 0: users.public.Users.AuthViaGoogle:input_type -> users.public.AuthViaGoogleRequest
 	2, // 1: users.public.Users.GoogleOAuthCallback:input_type -> users.public.GoogleOAuthCallbackRequest
-	1, // 2: users.public.Users.AuthViaGoogle:output_type -> users.public.AuthViaGoogleResponse
-	3, // 3: users.public.Users.GoogleOAuthCallback:output_type -> users.public.GoogleOAuthCallbackResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
+	4, // 2: users.public.Users.RefreshAccessToken:input_type -> users.public.RefreshAccessTokenRequest
+	6, // 3: users.public.Users.GetUser:input_type -> users.public.GetUserRequest
+	1, // 4: users.public.Users.AuthViaGoogle:output_type -> users.public.AuthViaGoogleResponse
+	3, // 5: users.public.Users.GoogleOAuthCallback:output_type -> users.public.GoogleOAuthCallbackResponse
+	5, // 6: users.public.Users.RefreshAccessToken:output_type -> users.public.RefreshAccessTokenResponse
+	7, // 7: users.public.Users.GetUser:output_type -> users.public.GetUserResponse
+	4, // [4:8] is the sub-list for method output_type
+	0, // [0:4] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -310,7 +559,7 @@ func file_users_public_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_users_public_proto_rawDesc), len(file_users_public_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

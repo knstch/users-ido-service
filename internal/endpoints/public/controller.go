@@ -2,6 +2,10 @@ package public
 
 import (
 	"net/http"
+
+	"github.com/knstch/knstch-libs/middleware"
+	"github.com/knstch/knstch-libs/transport"
+
 	"users-service/internal/endpoints/decoder"
 
 	"users-service/config"
@@ -10,6 +14,7 @@ import (
 
 	"github.com/knstch/knstch-libs/log"
 
+	httptransport "github.com/go-kit/kit/transport/http"
 	public "github.com/knstch/users-ido-api/public"
 
 	"github.com/knstch/knstch-libs/endpoints"
@@ -32,6 +37,8 @@ func NewController(svc users.Service, lg *log.Logger, cfg *config.Config) *Contr
 }
 
 func (c *Controller) Endpoints() []endpoints.Endpoint {
+	defaultMiddlewares := []middleware.Middleware{middleware.WithCookieAuth(c.cfg.JwtSecret)}
+
 	return []endpoints.Endpoint{
 		{
 			Method:  http.MethodGet,
@@ -46,6 +53,21 @@ func (c *Controller) Endpoints() []endpoints.Endpoint {
 			Handler: MakeGoogleOAuthCallbackEndpoint(c),
 			Decoder: decoder.DecodeGoogleOAuthCallbackRequest,
 			Encoder: encoder.EncodeGoogleOAuthCallbackResponse,
+		},
+		{
+			Method:  http.MethodPost,
+			Path:    "/refreshAccessToken",
+			Handler: MakeRefreshAccessTokenEndpoint(c),
+			Decoder: transport.DecodeJSONRequest[public.RefreshAccessTokenRequest],
+			Encoder: encoder.EncodeRefreshAccessTokenResponse,
+		},
+		{
+			Method:  http.MethodGet,
+			Path:    "/getUser",
+			Handler: MakeGetUserEndpoint(c),
+			Decoder: transport.DecodeQueryRequest[public.GetUserRequest],
+			Encoder: httptransport.EncodeJSONResponse,
+			Mdw:     defaultMiddlewares,
 		},
 	}
 }

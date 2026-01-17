@@ -27,6 +27,8 @@ type Config struct {
 	// PlatformURL is the base URL of the platform allowed for safe redirects.
 	PlatformURL string `envconfig:"PLATFORM_URL"`
 
+	Environment string `envconfig:"ENVIRONMENT"`
+
 	GoogleAPI GoogleAPI
 
 	DBConfig    DBConfig

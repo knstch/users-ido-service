@@ -32,6 +32,8 @@ type Service interface {
 	CompleteLogin(ctx context.Context, state, code string) (dto.AccessTokens, string, error)
 	// GetUser returns a user by filter fields.
 	GetUser(ctx context.Context, userToFind dto.GetUser) (dto.User, error)
+	// RefreshAccessToken revokes an old tokens pair and makes a new one.
+	RefreshAccessToken(ctx context.Context, refreshToken string) (dto.AccessTokens, error)
 }
 
 // NewService constructs the Users service.

@@ -62,8 +62,8 @@ github.com/knstch/knstch-libs v1.1.0 h1:KAF9J/z5i7zQdWSE1GY1rH9Tvy9ces8MHIZxEPZ2
 github.com/knstch/knstch-libs v1.1.0/go.mod h1:kJGh/pwU6jvpPSheGqa+L452ZY3J0vpFi2L9Z3/qXZg=
 github.com/knstch/trader-libs v0.3.6 h1:UDMhCyK/JrJqzo9oOwjo5PFX4aTlzr2Y4YBz1E1m4lY=
 github.com/knstch/trader-libs v0.3.6/go.mod h1:llzpq9ii815drIhEkloSsOXRte74viA22Rg+hpQeLNM=
-github.com/knstch/users-ido-api v0.0.5 h1:iQpNkDUTrU+x2aQLg5tyVUsr1DglfbsgKD6msOmSDug=
-github.com/knstch/users-ido-api v0.0.5/go.mod h1:9wP8Yz2AS3xK2p2K4RDHXIc6OjnX6lmLoDWwnxBj2WE=
+github.com/knstch/users-ido-api v0.0.6 h1:zuBHUeb+6MgmPnJ6kx0bN9ywgn2wJuDOvBglx305aB8=
+github.com/knstch/users-ido-api v0.0.6/go.mod h1:9wP8Yz2AS3xK2p2K4RDHXIc6OjnX6lmLoDWwnxBj2WE=
 github.com/kr/pretty v0.3.1 h1:flRD4NNwYAUpkphVc1HcthR4KEIFJ65n8Mw5qdRn3LE=
 github.com/kr/pretty v0.3.1/go.mod h1:hoEshYVHaxMs3cyo3Yncou5ZscifuDolrwPKZanG3xk=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=

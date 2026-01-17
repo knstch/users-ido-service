@@ -12,7 +12,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/knstch/knstch-libs v1.1.0
 	github.com/knstch/trader-libs v0.3.6
-	github.com/knstch/users-ido-api v0.0.5
+	github.com/knstch/users-ido-api v0.0.6
 	github.com/pressly/goose/v3 v3.24.2
 	github.com/prometheus/client_golang v1.23.2
 	github.com/redis/go-redis/v9 v9.17.2

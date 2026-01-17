@@ -15,9 +15,12 @@ func (r *DBRepo) RevokeAccessToken(ctx context.Context, refreshToken string) err
 	defer span.End()
 
 	now := time.Now()
-	if err := r.db.WithContext(ctx).Model(&modles.AccessToken{}).Where("refresh_token = ?", refreshToken).Updates(&modles.AccessToken{
-		RevokedAt: &now,
-	}).Error; err != nil {
+	if err := r.db.WithContext(ctx).
+		Model(&modles.AccessToken{}).
+		Where("refresh_token = ?", refreshToken).
+		Updates(&modles.AccessToken{
+			RevokedAt: &now,
+		}).Error; err != nil {
 		return fmt.Errorf("db.Updates: %w", err)
 	}
 

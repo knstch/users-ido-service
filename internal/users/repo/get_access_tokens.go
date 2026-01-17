@@ -29,5 +29,6 @@ func (r *DBRepo) GetAccessTokens(ctx context.Context, filter filters.AccessToken
 	return dto.AccessTokens{
 		AccessToken:  tokenPair.AccessToken,
 		RefreshToken: tokenPair.RefreshToken,
+		UserID:       tokenPair.UserID,
 	}, nil
 }

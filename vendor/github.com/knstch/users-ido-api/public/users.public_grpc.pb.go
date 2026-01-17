@@ -21,6 +21,8 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	Users_AuthViaGoogle_FullMethodName       = "/users.public.Users/AuthViaGoogle"
 	Users_GoogleOAuthCallback_FullMethodName = "/users.public.Users/GoogleOAuthCallback"
+	Users_RefreshAccessToken_FullMethodName  = "/users.public.Users/RefreshAccessToken"
+	Users_GetUser_FullMethodName             = "/users.public.Users/GetUser"
 )
 
 // UsersClient is the client API for Users service.
@@ -29,6 +31,8 @@ const (
 type UsersClient interface {
 	AuthViaGoogle(ctx context.Context, in *AuthViaGoogleRequest, opts ...grpc.CallOption) (*AuthViaGoogleResponse, error)
 	GoogleOAuthCallback(ctx context.Context, in *GoogleOAuthCallbackRequest, opts ...grpc.CallOption) (*GoogleOAuthCallbackResponse, error)
+	RefreshAccessToken(ctx context.Context, in *RefreshAccessTokenRequest, opts ...grpc.CallOption) (*RefreshAccessTokenResponse, error)
+	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
 }
 
 type usersClient struct {
@@ -59,12 +63,34 @@ func (c *usersClient) GoogleOAuthCallback(ctx context.Context, in *GoogleOAuthCa
 	return out, nil
 }
 
+func (c *usersClient) RefreshAccessToken(ctx context.Context, in *RefreshAccessTokenRequest, opts ...grpc.CallOption) (*RefreshAccessTokenResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RefreshAccessTokenResponse)
+	err := c.cc.Invoke(ctx, Users_RefreshAccessToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *usersClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUserResponse)
+	err := c.cc.Invoke(ctx, Users_GetUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UsersServer is the server API for Users service.
 // All implementations must embed UnimplementedUsersServer
 // for forward compatibility.
 type UsersServer interface {
 	AuthViaGoogle(context.Context, *AuthViaGoogleRequest) (*AuthViaGoogleResponse, error)
 	GoogleOAuthCallback(context.Context, *GoogleOAuthCallbackRequest) (*GoogleOAuthCallbackResponse, error)
+	RefreshAccessToken(context.Context, *RefreshAccessTokenRequest) (*RefreshAccessTokenResponse, error)
+	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
 	mustEmbedUnimplementedUsersServer()
 }
 
@@ -80,6 +106,12 @@ func (UnimplementedUsersServer) AuthViaGoogle(context.Context, *AuthViaGoogleReq
 }
 func (UnimplementedUsersServer) GoogleOAuthCallback(context.Context, *GoogleOAuthCallbackRequest) (*GoogleOAuthCallbackResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GoogleOAuthCallback not implemented")
+}
+func (UnimplementedUsersServer) RefreshAccessToken(context.Context, *RefreshAccessTokenRequest) (*RefreshAccessTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RefreshAccessToken not implemented")
+}
+func (UnimplementedUsersServer) GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
 }
 func (UnimplementedUsersServer) mustEmbedUnimplementedUsersServer() {}
 func (UnimplementedUsersServer) testEmbeddedByValue()               {}
@@ -138,6 +170,42 @@ func _Users_GoogleOAuthCallback_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Users_RefreshAccessToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RefreshAccessTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServer).RefreshAccessToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Users_RefreshAccessToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServer).RefreshAccessToken(ctx, req.(*RefreshAccessTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Users_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServer).GetUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Users_GetUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServer).GetUser(ctx, req.(*GetUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Users_ServiceDesc is the grpc.ServiceDesc for Users service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -152,6 +220,14 @@ var Users_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GoogleOAuthCallback",
 			Handler:    _Users_GoogleOAuthCallback_Handler,
+		},
+		{
+			MethodName: "RefreshAccessToken",
+			Handler:    _Users_RefreshAccessToken_Handler,
+		},
+		{
+			MethodName: "GetUser",
+			Handler:    _Users_GetUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -31,6 +31,8 @@ type Repository interface {
 	GetUser(ctx context.Context, filters filters.UserFilter) (dto.User, error)
 	// UpdateUserMetadata updates name/picture fields for the given user ID.
 	UpdateUserMetadata(ctx context.Context, id uint64, firstName, lastName, profilePic string) error
+	// RevokeAccessToken revokes access tokens.
+	RevokeAccessToken(ctx context.Context, refreshToken string) error
 }
 
 func (r *DBRepo) NewDBRepo(db *gorm.DB) *DBRepo {
