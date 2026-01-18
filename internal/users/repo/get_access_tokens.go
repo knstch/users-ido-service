@@ -11,14 +11,14 @@ import (
 
 	"users-service/internal/domain/dto"
 	"users-service/internal/users/filters"
-	"users-service/internal/users/modles"
+	"users-service/internal/users/models"
 )
 
 func (r *DBRepo) GetAccessTokens(ctx context.Context, filter filters.AccessTokenFilter) (dto.AccessTokens, error) {
 	ctx, span := tracing.StartSpan(ctx, "repo: GetAccessTokens")
 	defer span.End()
 
-	var tokenPair modles.AccessToken
+	var tokenPair models.AccessToken
 	if err := r.db.WithContext(ctx).Scopes(filter.ToScope()).First(&tokenPair).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return dto.AccessTokens{}, fmt.Errorf("db.First: %w", svcerrs.ErrDataNotFound)

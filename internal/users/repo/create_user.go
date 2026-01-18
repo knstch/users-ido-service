@@ -7,7 +7,7 @@ import (
 	"github.com/knstch/knstch-libs/tracing"
 
 	"users-service/internal/metrics"
-	"users-service/internal/users/modles"
+	"users-service/internal/users/models"
 )
 
 func (r *DBRepo) CreateUser(ctx context.Context, googleSub, email, firstName, lastName, profilePic string) (uint64, error) {
@@ -15,7 +15,7 @@ func (r *DBRepo) CreateUser(ctx context.Context, googleSub, email, firstName, la
 	defer span.End()
 
 	// Insert user record.
-	user := &modles.User{
+	user := &models.User{
 		GoogleSub:  googleSub,
 		Email:      email,
 		FirstName:  firstName,
@@ -23,7 +23,7 @@ func (r *DBRepo) CreateUser(ctx context.Context, googleSub, email, firstName, la
 		ProfilePic: profilePic,
 	}
 
-	if err := r.db.WithContext(ctx).Model(&modles.User{}).Create(user).Error; err != nil {
+	if err := r.db.WithContext(ctx).Model(&models.User{}).Create(user).Error; err != nil {
 		return 0, fmt.Errorf("db.Create: %w", err)
 	}
 

@@ -15,19 +15,15 @@ type Config struct {
 
 	// JaegerHost is the OpenTelemetry Jaeger collector endpoint.
 	JaegerHost string `envconfig:"JAEGER_HOST" default:"http://localhost:14268/api/traces"`
+
 	// ServiceName is used for logging, tracing and metrics labels.
 	ServiceName string `envconfig:"SERVICE_NAME" default:"service-template"`
 
 	// PublicHTTPAddr is the public HTTP server port.
 	PublicHTTPAddr string `envconfig:"PUBLIC_HTTP_ADDR" default:"8080"`
 
-	// KafkaAddr is the kafka bootstrap address (used by outbox).
-	KafkaAddr string `envconfig:"KAFKA_ADDR" default:"localhost:9092"`
-
 	// PlatformURL is the base URL of the platform allowed for safe redirects.
 	PlatformURL string `envconfig:"PLATFORM_URL"`
-
-	Environment string `envconfig:"ENVIRONMENT"`
 
 	GoogleAPI GoogleAPI
 

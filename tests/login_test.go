@@ -11,7 +11,7 @@ import (
 	"users-service/internal/domain/dto"
 	"users-service/internal/users"
 	"users-service/internal/users/filters"
-	"users-service/internal/users/modles"
+	"users-service/internal/users/models"
 	"users-service/testhelper"
 )
 
@@ -78,10 +78,10 @@ func (s *UsersServiceTestSuite) TestCompleteLogin_CreatesUserAndTokens_AndReturn
 	t.NotEmpty(tokens.RefreshToken)
 
 	// token pair is persisted
-	var tokenRow modles.AccessToken
+	var tokenRow models.AccessToken
 	tokenTx := s.db.
 		WithContext(ctx).
-		Model(&modles.AccessToken{}).
+		Model(&models.AccessToken{}).
 		Scopes((&filters.AccessTokenFilter{RefreshToken: tokens.RefreshToken}).ToScope())
 	err = tokenTx.First(&tokenRow).Error
 	t.NoError(err)
@@ -89,10 +89,10 @@ func (s *UsersServiceTestSuite) TestCompleteLogin_CreatesUserAndTokens_AndReturn
 	t.Equal(tokens.RefreshToken, tokenRow.RefreshToken)
 
 	// user row exists in DB
-	var userRow modles.User
+	var userRow models.User
 	userTx := s.db.
 		WithContext(ctx).
-		Model(&modles.User{}).
+		Model(&models.User{}).
 		Where("email = ?", testhelper.TestEmail)
 	err = userTx.First(&userRow).Error
 	t.NoError(err)
@@ -186,9 +186,9 @@ func (s *UsersServiceTestSuite) TestCompleteLogin_NameOnePart_DefaultsLovely() {
 	_, _, err = s.svc.CompleteLogin(ctx, state, testhelper.TestCode)
 	t.NoError(err)
 
-	var row modles.User
+	var row models.User
 	err = s.db.WithContext(ctx).
-		Model(&modles.User{}).
+		Model(&models.User{}).
 		Where("email = ?", testhelper.TestEmail).
 		First(&row).Error
 	t.NoError(err)
@@ -201,7 +201,7 @@ func (s *UsersServiceTestSuite) TestCompleteLogin_ExistingUser_UpdatesMetadata()
 	ctx := context.Background()
 
 	// Seed user in DB using the repo model.
-	seed := &modles.User{
+	seed := &models.User{
 		GoogleSub:  testhelper.TestGoogleSub,
 		Email:      testhelper.TestEmail,
 		FirstName:  "Old",
@@ -210,7 +210,7 @@ func (s *UsersServiceTestSuite) TestCompleteLogin_ExistingUser_UpdatesMetadata()
 	}
 	err := s.db.
 		WithContext(ctx).
-		Model(&modles.User{}).
+		Model(&models.User{}).
 		Create(seed).Error
 	t.NoError(err)
 	t.NotZero(seed.ID)
@@ -237,16 +237,16 @@ func (s *UsersServiceTestSuite) TestCompleteLogin_ExistingUser_UpdatesMetadata()
 	var count int64
 	err = s.db.
 		WithContext(ctx).
-		Model(&modles.User{}).
+		Model(&models.User{}).
 		Where("email = ?", testhelper.TestEmail).
 		Count(&count).Error
 	t.NoError(err)
 	t.Equal(int64(1), count)
 
-	var row modles.User
+	var row models.User
 	err = s.db.
 		WithContext(ctx).
-		Model(&modles.User{}).
+		Model(&models.User{}).
 		Where("email = ?", testhelper.TestEmail).
 		First(&row).Error
 	t.NoError(err)

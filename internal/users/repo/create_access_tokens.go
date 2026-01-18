@@ -6,14 +6,14 @@ import (
 
 	"github.com/knstch/knstch-libs/tracing"
 
-	"users-service/internal/users/modles"
+	"users-service/internal/users/models"
 )
 
 func (r *DBRepo) CreateAccessTokens(ctx context.Context, accessToken, refreshToken string, userID uint64) error {
 	ctx, span := tracing.StartSpan(ctx, "repo: CreateAccessToken")
 	defer span.End()
 
-	if err := r.db.WithContext(ctx).Model(&modles.AccessToken{}).Create(&modles.AccessToken{
+	if err := r.db.WithContext(ctx).Model(&models.AccessToken{}).Create(&models.AccessToken{
 		UserID:       userID,
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,

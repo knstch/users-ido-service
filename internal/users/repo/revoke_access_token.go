@@ -7,7 +7,7 @@ import (
 
 	"github.com/knstch/knstch-libs/tracing"
 
-	"users-service/internal/users/modles"
+	"users-service/internal/users/models"
 )
 
 func (r *DBRepo) RevokeAccessToken(ctx context.Context, refreshToken string) error {
@@ -16,9 +16,9 @@ func (r *DBRepo) RevokeAccessToken(ctx context.Context, refreshToken string) err
 
 	now := time.Now()
 	if err := r.db.WithContext(ctx).
-		Model(&modles.AccessToken{}).
+		Model(&models.AccessToken{}).
 		Where("refresh_token = ?", refreshToken).
-		Updates(&modles.AccessToken{
+		Updates(&models.AccessToken{
 			RevokedAt: &now,
 		}).Error; err != nil {
 		return fmt.Errorf("db.Updates: %w", err)
