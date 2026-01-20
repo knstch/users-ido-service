@@ -106,13 +106,13 @@ services:
       - postgres
 volumes:
   pg_data:
-    name: ido-pg_data
+    name: users-ido-pg_data
   pg_test_data:
-    name: ido-pg_test_data
+    name: users-ido-pg_test_data
   redis_test_data:
-    name: ido-redis_test_data
+    name: users-ido-redis_test_data
   redis_data:
-    name: ido-redis_data
+    name: users-ido-redis_data
 networks:
   ido-net:
     name: ido-net
