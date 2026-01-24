@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/knstch/trader-libs/auth"
+	"github.com/knstch/knstch-libs/auth"
 
 	"users-service/internal/domain/dto"
 	"users-service/internal/domain/enum"
