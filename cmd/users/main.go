@@ -26,6 +26,21 @@ import (
 	"users-service/internal/users/repo"
 )
 
+type corsOriginWriter struct {
+	http.ResponseWriter
+	origin string
+	wrote  bool
+}
+
+func (w *corsOriginWriter) WriteHeader(code int) {
+	if !w.wrote {
+		w.wrote = true
+		w.Header().Set("Access-Control-Allow-Origin", w.origin)
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+	}
+	w.ResponseWriter.WriteHeader(code)
+}
+
 func main() {
 	if err := run(); err != nil {
 		defaultLog.Println(err)
@@ -84,17 +99,28 @@ func run() error {
 	corsHandler := cors.New(cors.Options{
 		AllowOriginRequestFunc: func(r *http.Request, origin string) bool { return true },
 		AllowedMethods:         []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
-		AllowedHeaders:        []string{"*"},
-		AllowCredentials:      true,
+		AllowedHeaders:         []string{"*"},
+		AllowCredentials:       true,
 	}).Handler(http.TimeoutHandler(
 		publicEndpoints,
 		time.Second*5,
 		"service temporary unavailable",
 	))
 
+	// Force concrete origin (never *) so browser accepts when credentials are sent
+	wrapCORSOrigin := func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			origin := r.Header.Get("Origin")
+			if origin != "" {
+				w = &corsOriginWriter{ResponseWriter: w, origin: origin}
+			}
+			h.ServeHTTP(w, r)
+		})
+	}
+
 	srv := http.Server{
 		Addr:              ":" + cfg.PublicHTTPAddr,
-		Handler:           corsHandler,
+		Handler:           wrapCORSOrigin(corsHandler),
 		ReadHeaderTimeout: time.Millisecond * 500,
 		ReadTimeout:       time.Minute * 5,
 	}
