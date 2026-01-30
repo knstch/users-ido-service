@@ -15,7 +15,6 @@ import (
 	"github.com/knstch/knstch-libs/log"
 	"github.com/knstch/knstch-libs/tracing"
 	"github.com/redis/go-redis/v9"
-	"github.com/rs/cors"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -26,19 +25,23 @@ import (
 	"users-service/internal/users/repo"
 )
 
-type corsOriginWriter struct {
-	http.ResponseWriter
-	origin string
-	wrote  bool
-}
-
-func (w *corsOriginWriter) WriteHeader(code int) {
-	if !w.wrote {
-		w.wrote = true
-		w.Header().Set("Access-Control-Allow-Origin", w.origin)
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		origin := r.Header.Get("Origin")
+		if origin == "" {
+			next.ServeHTTP(w, r)
+			return
+		}
+		w.Header().Set("Access-Control-Allow-Origin", origin)
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
-	}
-	w.ResponseWriter.WriteHeader(code)
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")
+		w.Header().Set("Access-Control-Allow-Headers", "*")
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }
 
 func main() {
@@ -96,31 +99,15 @@ func run() error {
 	publicController := public.NewController(svc, logger, cfg)
 	publicEndpoints := endpoints.InitHttpEndpoints(cfg.ServiceName, publicController.Endpoints())
 
-	corsHandler := cors.New(cors.Options{
-		AllowOriginRequestFunc: func(r *http.Request, origin string) bool { return true },
-		AllowedMethods:         []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
-		AllowedHeaders:         []string{"*"},
-		AllowCredentials:       true,
-	}).Handler(http.TimeoutHandler(
+	handler := corsMiddleware(http.TimeoutHandler(
 		publicEndpoints,
 		time.Second*5,
 		"service temporary unavailable",
 	))
 
-	// Force concrete origin (never *) so browser accepts when credentials are sent
-	wrapCORSOrigin := func(h http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			origin := r.Header.Get("Origin")
-			if origin != "" {
-				w = &corsOriginWriter{ResponseWriter: w, origin: origin}
-			}
-			h.ServeHTTP(w, r)
-		})
-	}
-
 	srv := http.Server{
 		Addr:              ":" + cfg.PublicHTTPAddr,
-		Handler:           wrapCORSOrigin(corsHandler),
+		Handler:           handler,
 		ReadHeaderTimeout: time.Millisecond * 500,
 		ReadTimeout:       time.Minute * 5,
 	}
