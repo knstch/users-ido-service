@@ -15,6 +15,7 @@ import (
 	"github.com/knstch/knstch-libs/log"
 	"github.com/knstch/knstch-libs/tracing"
 	"github.com/redis/go-redis/v9"
+	"github.com/rs/cors"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -80,13 +81,20 @@ func run() error {
 	publicController := public.NewController(svc, logger, cfg)
 	publicEndpoints := endpoints.InitHttpEndpoints(cfg.ServiceName, publicController.Endpoints())
 
+	corsHandler := cors.New(cors.Options{
+		AllowOriginRequestFunc: func(r *http.Request, origin string) bool { return true },
+		AllowedMethods:         []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+		AllowedHeaders:        []string{"*"},
+		AllowCredentials:      true,
+	}).Handler(http.TimeoutHandler(
+		publicEndpoints,
+		time.Second*5,
+		"service temporary unavailable",
+	))
+
 	srv := http.Server{
-		Addr: ":" + cfg.PublicHTTPAddr,
-		Handler: http.TimeoutHandler(
-			publicEndpoints,
-			time.Second*5,
-			"service temporary unavailable",
-		),
+		Addr:              ":" + cfg.PublicHTTPAddr,
+		Handler:           corsHandler,
 		ReadHeaderTimeout: time.Millisecond * 500,
 		ReadTimeout:       time.Minute * 5,
 	}
