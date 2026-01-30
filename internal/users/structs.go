@@ -5,6 +5,7 @@ package users
 type OAuthState struct {
 	CSRF   string `json:"csrf"`
 	Return string `json:"return"`
+	Scheme string `json:"scheme"`
 }
 
 type GoogleIDTokenClaims struct {

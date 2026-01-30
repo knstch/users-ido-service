@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/go-kit/kit/endpoint"
 	"github.com/knstch/knstch-libs/tracing"
 
@@ -25,7 +26,12 @@ func (c *Controller) AuthViaGoogle(ctx context.Context, req *public.AuthViaGoogl
 	ctx, span := tracing.StartSpan(ctx, "public: AuthViaGoogle")
 	defer span.End()
 
-	loginURL, err := c.svc.AuthViaGoogle(ctx, req.GetLocation())
+	xfp, _ := ctx.Value(httptransport.ContextKeyRequestXForwardedProto).(string)
+	if xfp == "" {
+		xfp = "http"
+	}
+
+	loginURL, err := c.svc.AuthViaGoogle(ctx, req.GetLocation(), xfp)
 	if err != nil {
 		return nil, fmt.Errorf("svc.AuthViaGoogle: %w", err)
 	}

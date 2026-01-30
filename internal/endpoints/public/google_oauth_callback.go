@@ -26,12 +26,12 @@ func (c *Controller) GoogleOAuthCallback(ctx context.Context, req *public.Google
 	ctx, span := tracing.StartSpan(ctx, "public: GoogleOAuthCallback")
 	defer span.End()
 
-	tokens, returnURL, err := c.svc.CompleteLogin(ctx, req.GetState(), req.GetCode())
+	tokens, returnURL, scheme, err := c.svc.CompleteLogin(ctx, req.GetState(), req.GetCode())
 	if err != nil {
 		return nil, fmt.Errorf("svc.CompleteLogin: %w", err)
 	}
 
-	redirectURL, err := buildRedirectURL(c.cfg.PlatformURL, returnURL)
+	redirectURL, err := buildRedirectURL(c.cfg.PlatformURL, returnURL, scheme)
 	if err != nil {
 		return nil, fmt.Errorf("buildRedirectURL: %w", err)
 	}
@@ -46,34 +46,31 @@ func (c *Controller) GoogleOAuthCallback(ctx context.Context, req *public.Google
 // buildRedirectURL converts a returnURL (absolute or path) into an absolute URL
 // under platformURL. It is used to redirect the browser to the platform domain
 // after authentication is complete.
-func buildRedirectURL(platformURL string, returnURL string) (string, error) {
+func buildRedirectURL(platformURL string, returnURL string, scheme string) (string, error) {
 	if returnURL == "" {
 		return "", fmt.Errorf("empty returnURL")
 	}
 
-	// If returnURL is already an absolute URL, return it as-is
 	if strings.HasPrefix(returnURL, "http://") || strings.HasPrefix(returnURL, "https://") {
 		return returnURL, nil
 	}
 
-	// Parse platformURL to get base scheme and host
+	if scheme != "http" && scheme != "https" {
+		scheme = "http"
+	}
+
 	base, err := url.Parse(platformURL)
 	if err != nil {
 		return "", fmt.Errorf("url.Parse: %w", err)
 	}
-	if base.Scheme == "" || base.Host == "" {
+	if base.Host == "" {
 		return "", fmt.Errorf("invalid platformURL")
 	}
 
-	// Ensure returnURL starts with /
 	if !strings.HasPrefix(returnURL, "/") {
 		returnURL = "/" + returnURL
 	}
 
-	// Build the absolute URL: scheme://host/path
-	// Replace the path completely, don't append to base.Path
-	base.Path = returnURL
-	base.RawQuery = ""
-	base.Fragment = ""
-	return base.String(), nil
+	redirectURL := fmt.Sprintf("%s://%s%s", scheme, base.Host, returnURL)
+	return redirectURL, nil
 }

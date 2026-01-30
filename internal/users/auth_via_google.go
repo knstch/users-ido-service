@@ -26,12 +26,16 @@ const (
 // It validates the provided stateURL (return URL/path) against cfg.PlatformURL,
 // generates a CSRF token, stores it in Redis with a TTL, and returns a Google
 // authorization URL containing the encoded state.
-func (s *ServiceImpl) AuthViaGoogle(ctx context.Context, stateURL string) (string, error) {
+func (s *ServiceImpl) AuthViaGoogle(ctx context.Context, stateURL string, scheme string) (string, error) {
 	ctx, span := tracing.StartSpan(ctx, "users: AuthViaGoogle")
 	defer span.End()
 
 	if safe := validator.IsSafeRedirectURL(stateURL, s.cfg.PlatformURL); !safe {
 		return "", fmt.Errorf("unknown return url: %w", svcerrs.ErrInvalidData)
+	}
+
+	if scheme != "http" && scheme != "https" {
+		scheme = "http"
 	}
 
 	securityCode, err := utils.RandomString(randomStringLength)
@@ -42,6 +46,7 @@ func (s *ServiceImpl) AuthViaGoogle(ctx context.Context, stateURL string) (strin
 	stateJSON, err := json.Marshal(&OAuthState{
 		CSRF:   securityCode,
 		Return: stateURL,
+		Scheme: scheme,
 	})
 	if err != nil {
 		return "", fmt.Errorf("json.Marshal: %w", err)

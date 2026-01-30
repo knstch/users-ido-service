@@ -89,9 +89,6 @@ github.com/knstch/knstch-libs/prometeus
 github.com/knstch/knstch-libs/svcerrs
 github.com/knstch/knstch-libs/tracing
 github.com/knstch/knstch-libs/transport
-# github.com/knstch/trader-libs v0.3.6
-## explicit; go 1.24.3
-github.com/knstch/trader-libs/auth
 # github.com/knstch/users-ido-api v0.0.6
 ## explicit; go 1.24.1
 github.com/knstch/users-ido-api/public

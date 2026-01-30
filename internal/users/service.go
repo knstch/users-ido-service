@@ -26,10 +26,10 @@ type ServiceImpl struct {
 type Service interface {
 	// AuthViaGoogle returns a Google login URL.
 	// stateURL is the original page URL/path to return to after successful login.
-	AuthViaGoogle(ctx context.Context, stateURL string) (string, error)
+	AuthViaGoogle(ctx context.Context, stateURL string, scheme string) (string, error)
 	// CompleteLogin completes the OAuth flow by exchanging `code` for tokens and
-	// issuing service JWTs. It returns tokens and the validated return URL/path.
-	CompleteLogin(ctx context.Context, state, code string) (dto.AccessTokens, string, error)
+	// issuing service JWTs. It returns tokens, the validated return URL/path, and the original request scheme.
+	CompleteLogin(ctx context.Context, state, code string) (dto.AccessTokens, string, string, error)
 	// GetUser returns a user by filter fields.
 	GetUser(ctx context.Context, userToFind dto.GetUser) (dto.User, error)
 	// RefreshAccessToken revokes an old tokens pair and makes a new one.

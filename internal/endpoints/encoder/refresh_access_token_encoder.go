@@ -24,6 +24,8 @@ func EncodeRefreshAccessTokenResponse(ctx context.Context, w http.ResponseWriter
 
 	domain, secure := cookieDomainAndSecureFromRequestContext(ctx)
 
+	deleteOldCookies(w, domain, secure)
+
 	http.SetCookie(w, &http.Cookie{
 		Name:     "access_token",
 		Value:    resp.GetAccessToken(),
@@ -32,6 +34,7 @@ func EncodeRefreshAccessTokenResponse(ctx context.Context, w http.ResponseWriter
 		Secure:   secure,
 		SameSite: http.SameSiteLaxMode,
 		Domain:   domain,
+		MaxAge:   3600,
 	})
 
 	http.SetCookie(w, &http.Cookie{
@@ -42,11 +45,45 @@ func EncodeRefreshAccessTokenResponse(ctx context.Context, w http.ResponseWriter
 		Secure:   secure,
 		SameSite: http.SameSiteLaxMode,
 		Domain:   domain,
+		MaxAge:   604800,
 	})
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	return json.NewEncoder(w).Encode(resp)
+}
+
+func deleteOldCookies(w http.ResponseWriter, currentDomain string, secure bool) {
+	cookieNames := []string{"access_token", "refresh_token"}
+	domains := []string{"", currentDomain}
+	if currentDomain != "" && !strings.HasPrefix(currentDomain, ".") {
+		domains = append(domains, "."+currentDomain)
+	}
+	
+	for _, name := range cookieNames {
+		for _, domain := range domains {
+			http.SetCookie(w, &http.Cookie{
+				Name:     name,
+				Value:    "",
+				Path:     "/",
+				HttpOnly: true,
+				Secure:   secure,
+				SameSite: http.SameSiteLaxMode,
+				Domain:   domain,
+				MaxAge:   -1,
+			})
+			http.SetCookie(w, &http.Cookie{
+				Name:     name,
+				Value:    "",
+				Path:     "/",
+				HttpOnly: true,
+				Secure:   secure,
+				SameSite: http.SameSiteNoneMode,
+				Domain:   domain,
+				MaxAge:   -1,
+			})
+		}
+	}
 }
 
 func cookieDomainAndSecureFromRequestContext(ctx context.Context) (domain string, secure bool) {

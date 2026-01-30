@@ -77,27 +77,32 @@ func parseJWTClaimsNoVerify(idToken string) (GoogleIDTokenClaims, error) {
 //   - mints service access/refresh tokens
 //   - stores tokens in Postgres
 //
-// It returns the minted tokens and the validated return URL/path from state.
-func (s *ServiceImpl) CompleteLogin(ctx context.Context, state, code string) (dto.AccessTokens, string, error) {
+// It returns the minted tokens, the validated return URL/path from state, and the original request scheme.
+func (s *ServiceImpl) CompleteLogin(ctx context.Context, state, code string) (dto.AccessTokens, string, string, error) {
 	ctx, span := tracing.StartSpan(ctx, "users: CompleteLogin")
 	defer span.End()
 
 	parsedState, err := parseOAuthState(state)
 	if err != nil {
-		return dto.AccessTokens{}, "", err
+		return dto.AccessTokens{}, "", "", err
 	}
 
 	stateKey := "oauth:state:" + parsedState.CSRF
 	returnURL, err := s.redis.Get(ctx, stateKey).Result()
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
-			return dto.AccessTokens{}, "", fmt.Errorf("CSRF token not found")
+			return dto.AccessTokens{}, "", "", fmt.Errorf("CSRF token not found")
 		}
-		return dto.AccessTokens{}, "", fmt.Errorf("redis.Get: %w", err)
+		return dto.AccessTokens{}, "", "", fmt.Errorf("redis.Get: %w", err)
 	}
 
 	if returnURL != parsedState.Return {
-		return dto.AccessTokens{}, "", fmt.Errorf("state mismatch: %w", svcerrs.ErrInvalidData)
+		return dto.AccessTokens{}, "", "", fmt.Errorf("state mismatch: %w", svcerrs.ErrInvalidData)
+	}
+
+	scheme := parsedState.Scheme
+	if scheme != "http" && scheme != "https" {
+		scheme = "http"
 	}
 
 	_ = s.redis.Del(ctx, stateKey).Err()
@@ -109,12 +114,12 @@ func (s *ServiceImpl) CompleteLogin(ctx context.Context, state, code string) (dt
 		RedirectURI:    s.cfg.GoogleAPI.GoogleRedirectURI,
 	})
 	if err != nil {
-		return dto.AccessTokens{}, "", fmt.Errorf("google.ExchangeCodeToToken: %w", err)
+		return dto.AccessTokens{}, "", "", fmt.Errorf("google.ExchangeCodeToToken: %w", err)
 	}
 
 	claims, err := parseJWTClaimsNoVerify(resp.IDToken)
 	if err != nil {
-		return dto.AccessTokens{}, "", fmt.Errorf("parseJWTClaimsNoVerify: %w", err)
+		return dto.AccessTokens{}, "", "", fmt.Errorf("parseJWTClaimsNoVerify: %w", err)
 	}
 
 	fullName := strings.Split(claims.Name, " ")
@@ -137,7 +142,7 @@ func (s *ServiceImpl) CompleteLogin(ctx context.Context, state, code string) (dt
 		if errors.Is(err, svcerrs.ErrDataNotFound) {
 			userExists = false
 		} else {
-			return dto.AccessTokens{}, "", fmt.Errorf("repo.GetUser: %w", err)
+			return dto.AccessTokens{}, "", "", fmt.Errorf("repo.GetUser: %w", err)
 		}
 	}
 	if userExists {
@@ -175,8 +180,8 @@ func (s *ServiceImpl) CompleteLogin(ctx context.Context, state, code string) (dt
 
 		return nil
 	}); err != nil {
-		return dto.AccessTokens{}, "", fmt.Errorf("repo.Transaction: %w", err)
+		return dto.AccessTokens{}, "", "", fmt.Errorf("repo.Transaction: %w", err)
 	}
 
-	return accessTokens, parsedState.Return, nil
+	return accessTokens, parsedState.Return, scheme, nil
 }
