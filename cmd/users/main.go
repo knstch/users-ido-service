@@ -15,6 +15,7 @@ import (
 	"github.com/knstch/knstch-libs/log"
 	"github.com/knstch/knstch-libs/tracing"
 	"github.com/redis/go-redis/v9"
+	"github.com/rs/cors"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -24,25 +25,6 @@ import (
 	"users-service/internal/users"
 	"users-service/internal/users/repo"
 )
-
-func corsMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		origin := r.Header.Get("Origin")
-		if origin == "" {
-			next.ServeHTTP(w, r)
-			return
-		}
-		w.Header().Set("Access-Control-Allow-Origin", origin)
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")
-		w.Header().Set("Access-Control-Allow-Headers", "*")
-		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusNoContent)
-			return
-		}
-		next.ServeHTTP(w, r)
-	})
-}
 
 func main() {
 	if err := run(); err != nil {
@@ -99,7 +81,14 @@ func run() error {
 	publicController := public.NewController(svc, logger, cfg)
 	publicEndpoints := endpoints.InitHttpEndpoints(cfg.ServiceName, publicController.Endpoints())
 
-	handler := corsMiddleware(http.TimeoutHandler(
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+		AllowedHeaders:   []string{"Origin", "Content-Type", "Authorization"},
+		ExposedHeaders:   []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * 3600,
+	}).Handler(http.TimeoutHandler(
 		publicEndpoints,
 		time.Second*5,
 		"service temporary unavailable",
@@ -107,7 +96,7 @@ func run() error {
 
 	srv := http.Server{
 		Addr:              ":" + cfg.PublicHTTPAddr,
-		Handler:           handler,
+		Handler:           corsHandler,
 		ReadHeaderTimeout: time.Millisecond * 500,
 		ReadTimeout:       time.Minute * 5,
 	}
